@@ -2,7 +2,8 @@
 const co = require('co').wrap
 
 module.exports = {
-  loudCo
+  loudCo,
+  cachifyPromiser
 }
 
 function loudCo (gen) {
@@ -14,4 +15,13 @@ function loudCo (gen) {
       throw err
     }
   })
+}
+
+function cachifyPromiser (fn) {
+  let promise
+  return function (...args) {
+    if (!promise) promise = fn.apply(this, args)
+
+    return promise
+  }
 }

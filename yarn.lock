@@ -14,6 +14,23 @@
     randombytes "^2.0.1"
     typeforce "^1.0.0"
 
+"@tradle/build-resource@tradle/build-resource":
+  version "1.0.0"
+  resolved "https://codeload.github.com/tradle/build-resource/tar.gz/bf72d5bc6b2b295b38d5d4c56a85dcf7e612db32"
+  dependencies:
+    clone "^2.1.0"
+    deep-equal "^1.0.1"
+    object.pick "^1.2.0"
+    xtend "^4.0.1"
+
+"@tradle/custom-models@https://github.com/tradle/custom-models":
+  version "4.10.10"
+  resolved "https://github.com/tradle/custom-models#30865f34a76e467665155de0a202eb4b7ef64419"
+  dependencies:
+    minimist "^1.2.0"
+    typeforce "^1.10.6"
+    write-file-atomic "^1.1.4"
+
 "@tradle/engine@^4.10.0":
   version "4.10.0"
   resolved "https://registry.yarnpkg.com/@tradle/engine/-/engine-4.10.0.tgz#c2e290769b924b1e408fc5aabb1505794ab8b7d3"
@@ -52,6 +69,21 @@
     typeforce "^1.6.2"
     xtend "^4.0.1"
 
+"@tradle/merge-models@tradle/merge-models":
+  version "1.0.0"
+  resolved "https://codeload.github.com/tradle/merge-models/tar.gz/d7a79908d5964b0be2c67742e7a4858f6a05ad5d"
+  dependencies:
+    deep-equal "^1.0.1"
+    xtend "^4.0.1"
+
+"@tradle/models@https://github.com/tradle/models":
+  version "4.10.10"
+  resolved "https://github.com/tradle/models#5fba11f31beff25efcabe323643667af6e034b8a"
+  dependencies:
+    minimist "^1.2.0"
+    typeforce "^1.10.6"
+    write-file-atomic "^1.1.4"
+
 "@tradle/protocol@2.3.0":
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/@tradle/protocol/-/protocol-2.3.0.tgz#e2509df829aa1d701561ee4fbe006cdb9a32e23b"
@@ -67,6 +99,23 @@
     traverse "^0.6.6"
     typeforce "^1.6.2"
     xtend "^4.0.1"
+
+"@tradle/validate-model@tradle/validate-model":
+  version "1.0.0"
+  resolved "https://codeload.github.com/tradle/validate-model/tar.gz/5ccb34131fbd3c6152bc966d6548c0724774ddd9"
+  dependencies:
+    object.omit "^2.0.1"
+    object.pick "^1.2.0"
+    typeforce "^1.10.6"
+    xtend "^4.0.1"
+
+"@tradle/validate-resource@tradle/validate-resource":
+  version "1.0.0"
+  resolved "https://codeload.github.com/tradle/validate-resource/tar.gz/9b8819d819b62ebfbb28ad2f970b5a401ca94cf1"
+  dependencies:
+    object.omit "^2.0.1"
+    object.pick "^1.2.0"
+    traverse "^0.6.6"
 
 abstract-leveldown@2.4.1:
   version "2.4.1"
@@ -351,8 +400,9 @@ chalk@^2.0.0:
     escape-string-regexp "^1.0.5"
     supports-color "^4.0.0"
 
-changes-feed@mvayngrib/changes-feed:
+"changes-feed@github:mvayngrib/changes-feed", changes-feed@mvayngrib/changes-feed:
   version "1.1.0"
+  uid dbe4f4ce2f0e9a1ba0a98926ab76134320a7ec3a
   resolved "https://codeload.github.com/mvayngrib/changes-feed/tar.gz/dbe4f4ce2f0e9a1ba0a98926ab76134320a7ec3a"
   dependencies:
     from2 "^1.3.0"
@@ -387,7 +437,7 @@ cli-width@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/cli-width/-/cli-width-2.1.0.tgz#b234ca209b29ef66fc518d9b98d5847b00edf00a"
 
-clone@^2.0.0, clone@^2.1.1:
+clone@^2.0.0, clone@^2.1.0, clone@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/clone/-/clone-2.1.1.tgz#d217d1e961118e3ac9a4b8bba3285553bf647cdb"
 
@@ -530,6 +580,12 @@ doctrine@^2.0.0:
   dependencies:
     esutils "^2.0.2"
     isarray "^1.0.0"
+
+dot-prop@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/dot-prop/-/dot-prop-4.2.0.tgz#1f19e0c2e1aa0e32797c49799f2837ac6af69c57"
+  dependencies:
+    is-obj "^1.0.0"
 
 drbg.js@^1.0.1:
   version "1.0.1"
@@ -910,7 +966,7 @@ globby@^5.0.0:
     pify "^2.0.0"
     pinkie-promise "^2.0.0"
 
-graceful-fs@^4.1.2:
+graceful-fs@^4.1.11, graceful-fs@^4.1.2:
   version "4.1.11"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.1.11.tgz#0e8bdfe4d1ddb8854d64e04ea7c00e2a026e5658"
 
@@ -1035,6 +1091,10 @@ is-function@~1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/is-function/-/is-function-1.0.1.tgz#12cfb98b65b57dd3d193a3121f5f6e2f437602b5"
 
+is-obj@^1.0.0:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/is-obj/-/is-obj-1.0.1.tgz#3e4729ac1f5fde025cd7d83a896dab9f4f67db0f"
+
 is-path-cwd@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/is-path-cwd/-/is-path-cwd-1.0.0.tgz#d225ec23132e89edd38fda767472e62e65f1106d"
@@ -1079,13 +1139,19 @@ isarray@0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/isarray/-/isarray-0.0.1.tgz#8a18acfca9a8f4177e09abfc6038939b05d1eedf"
 
-isarray@^1.0.0, isarray@~1.0.0:
+isarray@1.0.0, isarray@^1.0.0, isarray@~1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/isarray/-/isarray-1.0.0.tgz#bb935d48582cba168c06834957a54a3e07124f11"
 
 isexe@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/isexe/-/isexe-2.0.0.tgz#e8fbf374dc556ff8947a10dcb0572d633f2cfa10"
+
+isobject@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/isobject/-/isobject-2.1.0.tgz#f065561096a3f1da2ef46272f815c840d87e0c89"
+  dependencies:
+    isarray "1.0.0"
 
 js-tokens@^3.0.0:
   version "3.0.2"
@@ -1124,9 +1190,9 @@ jsonify@~0.0.0:
     bn.js ">= 3.1.2 <5"
     elliptic "^6.4.0"
 
-level-change-processor@mvayngrib/level-change-processor#7100404:
+"level-change-processor@git+https://github.com/mvayngrib/level-change-processor#7100404":
   version "1.0.0"
-  resolved "https://codeload.github.com/mvayngrib/level-change-processor/tar.gz/7100404"
+  resolved "git+https://github.com/mvayngrib/level-change-processor#7100404"
   dependencies:
     inherits "^2.0.1"
     readable-stream "^1.0.33"
@@ -1136,12 +1202,12 @@ level-codec@~6.1.0:
   resolved "https://registry.yarnpkg.com/level-codec/-/level-codec-6.1.0.tgz#f5df0a99582f76dac43855151ab6f4e4d0d60045"
 
 level-codec@~7.0.0:
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/level-codec/-/level-codec-7.0.0.tgz#c755b68d0d44ffa0b1cba044b8f81a55a14ad39b"
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/level-codec/-/level-codec-7.0.1.tgz#341f22f907ce0f16763f24bddd681e395a0fb8a7"
 
 level-errors@^1.0.3, level-errors@^1.0.4, level-errors@~1.0.3:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/level-errors/-/level-errors-1.0.4.tgz#3585e623974c737a93755492a43c0267cda4425f"
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/level-errors/-/level-errors-1.0.5.tgz#83dbfb12f0b8a2516bdc9a31c4876038e227b859"
   dependencies:
     errno "~0.1.1"
 
@@ -1292,9 +1358,9 @@ merkle-proofs@1.0.3, merkle-proofs@^1.0.3:
     merkle-tree-stream mvayngrib/merkle-tree-stream#finalize
     readable-stream "^2.1.0"
 
-merkle-tree-stream@mvayngrib/merkle-tree-stream#finalize:
+"merkle-tree-stream@git+https://github.com/mvayngrib/merkle-tree-stream#finalize":
   version "3.0.3"
-  resolved "https://codeload.github.com/mvayngrib/merkle-tree-stream/tar.gz/ef1abd6b566a410f8cdc7190f0966b97f403e290"
+  resolved "git+https://github.com/mvayngrib/merkle-tree-stream#ef1abd6b566a410f8cdc7190f0966b97f403e290"
   dependencies:
     flat-tree "^1.3.0"
     readable-stream "^2.0.5"
@@ -1435,6 +1501,12 @@ object.omit@^2.0.1:
   dependencies:
     for-own "^0.1.4"
     is-extendable "^0.1.1"
+
+object.pick@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/object.pick/-/object.pick-1.2.0.tgz#b5392bee9782da6d9fb7d6afaf539779f1234c2b"
+  dependencies:
+    isobject "^2.1.0"
 
 once@^1.3.0, once@^1.3.1, once@^1.3.3, once@^1.4.0:
   version "1.4.0"
@@ -1818,6 +1890,10 @@ slice-ansi@0.0.4:
   version "0.0.4"
   resolved "https://registry.yarnpkg.com/slice-ansi/-/slice-ansi-0.0.4.tgz#edbf8903f66f7ce2f8eafd6ceed65e264c831b35"
 
+slide@^1.1.5:
+  version "1.1.6"
+  resolved "https://registry.yarnpkg.com/slide/-/slide-1.1.6.tgz#56eb027d65b4d2dce6cb2e2d32c4d4afc9e1d707"
+
 "source-map@>= 0.1.2":
   version "0.5.6"
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.5.6.tgz#75ce38f52bf0733c5a7f0c118d81334a2bb5f412"
@@ -2063,7 +2139,7 @@ typedarray@^0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
 
-typeforce@^1.0.0, typeforce@^1.6.2:
+typeforce@^1.0.0, typeforce@^1.10.6, typeforce@^1.6.2:
   version "1.11.3"
   resolved "https://registry.yarnpkg.com/typeforce/-/typeforce-1.11.3.tgz#a54d0ff58808788fba358020982270bd6995d8e4"
   dependencies:
@@ -2104,6 +2180,14 @@ wordwrap@~1.0.0:
 wrappy@1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/wrappy/-/wrappy-1.0.2.tgz#b5243d8f3ec1aa35f1364605bc0d1036e30ab69f"
+
+write-file-atomic@^1.1.4:
+  version "1.3.4"
+  resolved "https://registry.yarnpkg.com/write-file-atomic/-/write-file-atomic-1.3.4.tgz#f807a4f0b1d9e913ae7a48112e6cc3af1991b45f"
+  dependencies:
+    graceful-fs "^4.1.11"
+    imurmurhash "^0.1.4"
+    slide "^1.1.5"
 
 write@^0.2.1:
   version "0.2.1"

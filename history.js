@@ -20,7 +20,7 @@ function History (opts) {
     include: ['get', 'put', 'del', 'batch']
   })
 
-  this._feed = changesFeed(db)
+  this._feed = changesFeed(db, { start: 0 })
   this._append = promisify(this._feed.append.bind(this._feed))
   this.length = promisify(this._feed.count.bind(this._feed))
   this._get = promisify(keeper.get.bind(keeper))
@@ -35,19 +35,19 @@ History.prototype.append = function ({ message, inbound }) {
   })
 }
 
-History.prototype.dump = function () {
+History.prototype.dump = function (body=true) {
   const stream = this._feed.createReadStream({ keys: false })
-  return collect(this._withBodies(stream))
+  return collect(body ? this._withBodies(stream) : stream)
 }
 
-History.prototype.head = co(function* (n) {
+History.prototype.head = co(function* (n, body=true) {
   const count = yield this.length()
   const stream = this._feed.createReadStream({
     keys: false,
-    start: count - n
+    since: count - n - 1
   })
 
-  return collect(this._withBodies(stream))
+  return collect(body ? this._withBodies(stream) : stream)
 })
 
 History.prototype._withBodies = function _withBodies (stream) {

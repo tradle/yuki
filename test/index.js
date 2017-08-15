@@ -4,12 +4,16 @@ const test = require('tape')
 const memdb = require('memdb')
 const omit = require('object.omit')
 const tradle = require('@tradle/engine')
+const mergeModels = require('@tradle/merge-models')
+const buildResource = require('@tradle/build-resource')
 const { TYPE, SIG } = tradle.constants
-const users = require('./users')
 const createLiteNode = require('../').node
 const createYuki = require('../').yuki
+const models = require('../models')
 const echo = require('../echo')
+const onboard = require('../onboard')
 const { loudCo } = require('../utils')
+const users = require('./users')
 
 // test('send/receive', loudCo(function* (t) {
 //   const [alice, bob] = users.slice(2).map(createLiteNode)
@@ -103,10 +107,53 @@ test('yuki', loudCo(function* (t) {
   const messages = yield yuki.history.dump()
   t.notSame(forYuki.message.object, forAlice.message.object)
   t.same(omit(forYuki.object, [SIG]), omit(forAlice.object, [SIG]))
-  t.same(forYuki.message.object, messages[0].object)
-  t.same(forAlice.message.object, messages[1].object)
+  t.same(messages[0].object, forYuki.message.object)
+  t.same(messages[1].object, forAlice.message.object)
+
+  const head = yield yuki.history.head(1)
+  t.equal(head.length, 1)
+  t.same(head[0].object, forAlice.message.object)
   t.end()
 }))
+
+// test('onboard', function (t) {
+//   const alice = createLiteNode(users[0])
+//   const { identity, keys } = users[1]
+//   const objects = {}
+//   const yuki = createYuki({
+//     identity,
+//     keys,
+//     counterparty: {
+//       sigPubKey: alice.sigPubKey,
+//       keeper: {
+//         get: function (link, cb) {
+//           if (link in objects) return cb(null, objects[link])
+
+//           cb(new Error('NotFound'))
+//         }
+//       },
+//       receive: function (message, from) {
+//         return Promise.resolve()
+//       }
+//     },
+//     db: memdb()
+//   })
+
+//   const onboardAPI = yuki.use(onboard())
+//   yuki.hook('receive', function ({ message }) {
+//     objects[tradle.utils.hexLink(message.object)] = message.object
+//   })
+
+//   const photoID = buildResource.fake({
+//     models,
+//     model: models['tradle.PhotoID'],
+//     signed: true
+//   })
+
+//   const v = onboardAPI.createVerificationForPhotoID(photoID)
+//   console.log(JSON.stringify(v, null, 2))
+//   t.end()
+// })
 
 function connect (a, b) {
   a._send = function ({ to, message }) {

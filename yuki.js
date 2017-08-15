@@ -45,6 +45,10 @@ function Yuki (opts) {
     db: sub(db, 'h', { valueEncoding: 'json' })
   })
 
+  this.storage = promisify(sub(db, 's', { valueEncoding: 'json' }), {
+    include: ['get', 'put', 'del', 'batch', 'close']
+  })
+
   this.hooks = createHooks()
   this.hook = this.hooks.hook.bind(this.hooks)
   this.hook('receive', ({ message }) => {
@@ -68,6 +72,13 @@ proto.sign = function ({ object }) {
 }
 
 proto.send = co(function* ({ object, other={} }) {
+  if (typeof object === 'string') {
+    object = {
+      [TYPE]: 'tradle.SimpleMessage',
+      message: object
+    }
+  }
+
   if (!object[SIG]) {
     const signed = yield this.sign({ object })
     object = signed.object
@@ -96,5 +107,5 @@ proto.receive = co(function* (...args) {
 })
 
 proto.use = function (strategy, opts) {
-  strategy(this, opts)
+  return strategy(this, opts)
 }
