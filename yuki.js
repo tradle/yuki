@@ -1,16 +1,18 @@
 const { EventEmitter } = require('events')
 const inherits = require('inherits')
 const co = require('co').wrap
+const promisify = require('pify')
 const debug = require('debug')(require('./package.json').name)
 const clone = require('clone')
 const bindAll = require('bindall')
 const sub = require('subleveldown')
 const createHooks = require('event-hooks')
 const tradle = require('@tradle/engine')
-const { utils, constants } = tradle
-const { SIG } = constants
+const { utils, constants, typeforce, types, protocol } = tradle
+const sign = promisify(protocol.sign)
+const { TYPE, TYPES, SIG, PERMALINK } = constants
+const { MESSAGE } = TYPES
 const createHistory = require('./history')
-const createNode = require('./node')
 
 module.exports = Yuki
 
@@ -18,25 +20,26 @@ function Yuki (opts) {
   if (!(this instanceof Yuki)) return new Yuki(opts)
 
   EventEmitter.call(this)
-
-  const { counterparty, db, link, identity, keys } = opts
   bindAll(this)
 
+  const { counterparty, db, link, identity, keys } = opts
   this.counterparty = counterparty
-  this.node = createNode({
-    link,
-    identity,
-    keys
-  })
-
-  this.node._send = function ({ message }) {
-    return counterparty.receive(message, {
-      permalink: utils.getLinks(identity).permalink
-    })
+  this.identity = identity
+  this.keys = keys.map(key => utils.importKey(key))
+  this.sigKey = utils.sigKey(this.keys)
+  this.sigPubKey = utils.toECKeyObj(this.sigKey.toJSON())
+  this.identityVersioningKey = utils.identityVersioningKey(this.keys)
+  this.identityVersioningPubKey = utils.identityVersioningPubKey(this.identity)
+  this.link = link || utils.hexLink(this.identity)
+  this.permalink = this.identity[PERMALINK] || this.link
+  this.shortlink = utils.shortlink(this.permalink)
+  this._authorOpts = {
+    sigPubKey: this.sigPubKey,
+    sign: (data, cb) => {
+      this.sigKey.sign(data, cb)
+    }
   }
 
-  this.permalink = this.node.permalink
-  this.sigPubKey = this.node.sigPubKey
   this.history = createHistory({
     keeper: counterparty.keeper,
     db: sub(db, 'h', { valueEncoding: 'json' })
@@ -55,18 +58,36 @@ function Yuki (opts) {
 const proto = Yuki.prototype
 inherits(Yuki, EventEmitter)
 
-proto.send = co(function* (opts) {
-  const { object } = opts
-  const message = yield this.node.send({
-    to: {
-      pubKey: this.counterparty.sigPubKey
-    },
+proto.sign = function ({ object }) {
+  object = clone(object)
+  delete object[SIG]
+  return sign({
+    object,
+    author: this._authorOpts
+  })
+}
+
+proto.send = co(function* ({ object, other={} }) {
+  if (!object[SIG]) {
+    const signed = yield this.sign({ object })
+    object = signed.object
+  }
+
+  const message = utils.extend({
+    [TYPE]: MESSAGE,
+    recipientPubKey: this.counterparty.sigPubKey,
     object
+  }, other)
+
+  const result = yield this.sign({ object: message })
+  const signedMessage = result.object
+  yield this.counterparty.receive(message, {
+    permalink: this.permalink
   })
 
-  yield this.hooks.fire('send', message)
-  yield this.history.append({ message })
-  return message
+  yield this.hooks.fire('send', signedMessage)
+  yield this.history.append({ message: signedMessage })
+  return signedMessage
 })
 
 proto.receive = co(function* (...args) {

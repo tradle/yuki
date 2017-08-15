@@ -94,7 +94,7 @@ test('yuki', loudCo(function* (t) {
 
   yield alice.send({
     to: {
-      pubKey: yuki.node.sigPubKey
+      pubKey: yuki.sigPubKey
     },
     object
   })
