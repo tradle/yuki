@@ -400,9 +400,8 @@ chalk@^2.0.0:
     escape-string-regexp "^1.0.5"
     supports-color "^4.0.0"
 
-"changes-feed@github:mvayngrib/changes-feed", changes-feed@mvayngrib/changes-feed:
+changes-feed@mvayngrib/changes-feed:
   version "1.1.0"
-  uid dbe4f4ce2f0e9a1ba0a98926ab76134320a7ec3a
   resolved "https://codeload.github.com/mvayngrib/changes-feed/tar.gz/dbe4f4ce2f0e9a1ba0a98926ab76134320a7ec3a"
   dependencies:
     from2 "^1.3.0"
@@ -1190,9 +1189,9 @@ jsonify@~0.0.0:
     bn.js ">= 3.1.2 <5"
     elliptic "^6.4.0"
 
-"level-change-processor@git+https://github.com/mvayngrib/level-change-processor#7100404":
+level-change-processor@mvayngrib/level-change-processor#7100404:
   version "1.0.0"
-  resolved "git+https://github.com/mvayngrib/level-change-processor#7100404"
+  resolved "https://codeload.github.com/mvayngrib/level-change-processor/tar.gz/7100404"
   dependencies:
     inherits "^2.0.1"
     readable-stream "^1.0.33"
@@ -1358,9 +1357,9 @@ merkle-proofs@1.0.3, merkle-proofs@^1.0.3:
     merkle-tree-stream mvayngrib/merkle-tree-stream#finalize
     readable-stream "^2.1.0"
 
-"merkle-tree-stream@git+https://github.com/mvayngrib/merkle-tree-stream#finalize":
+merkle-tree-stream@mvayngrib/merkle-tree-stream#finalize:
   version "3.0.3"
-  resolved "git+https://github.com/mvayngrib/merkle-tree-stream#ef1abd6b566a410f8cdc7190f0966b97f403e290"
+  resolved "https://codeload.github.com/mvayngrib/merkle-tree-stream/tar.gz/ef1abd6b566a410f8cdc7190f0966b97f403e290"
   dependencies:
     flat-tree "^1.3.0"
     readable-stream "^2.0.5"
@@ -2208,6 +2207,13 @@ xtend@~2.1.1:
 xtend@~3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/xtend/-/xtend-3.0.0.tgz#5cce7407baf642cba7becda568111c493f59665a"
+
+ya-promise-queue@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/ya-promise-queue/-/ya-promise-queue-1.1.0.tgz#06fa8b388193c1dc5a8335d1986f687287efd3b7"
+  dependencies:
+    any-promise "^1.3.0"
+    co "^4.6.0"
 
 yallist@^2.1.2:
   version "2.1.2"

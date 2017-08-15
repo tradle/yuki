@@ -17,7 +17,8 @@
     "pify": "^3.0.0",
     "pump": "^1.0.2",
     "stream-collector": "^1.0.1",
-    "subleveldown": "^2.1.0"
+    "subleveldown": "^2.1.0",
+    "ya-promise-queue": "^1.1.0"
   },
   "peerDependencies": {
     "@tradle/custom-models": "*",

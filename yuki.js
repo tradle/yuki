@@ -7,6 +7,7 @@ const clone = require('clone')
 const bindAll = require('bindall')
 const sub = require('subleveldown')
 const createHooks = require('event-hooks')
+const createPromiseQueue = require('ya-promise-queue')
 const tradle = require('@tradle/engine')
 const { utils, constants, typeforce, types, protocol } = tradle
 const sign = promisify(protocol.sign)
@@ -57,10 +58,12 @@ function Yuki (opts) {
       inbound: true
     })
   })
+
+  this.receiveQueue = createPromiseQueue()
 }
 
-const proto = Yuki.prototype
 inherits(Yuki, EventEmitter)
+const proto = Yuki.prototype
 
 proto.sign = function ({ object }) {
   object = clone(object)
@@ -92,7 +95,7 @@ proto.send = co(function* ({ object, other={} }) {
 
   const result = yield this.sign({ object: message })
   const signedMessage = result.object
-  yield this.counterparty.receive(message, {
+  yield this.counterparty.receive(signedMessage, {
     permalink: this.permalink
   })
 
@@ -101,10 +104,19 @@ proto.send = co(function* ({ object, other={} }) {
   return signedMessage
 })
 
-proto.receive = co(function* (...args) {
-  yield this.hooks.fire('receive', ...args)
-  this.emit('message', ...args)
-})
+proto.receive = function (...args) {
+  const self = this
+  return this.receiveQueue.push(co(function* () {
+    try {
+      yield self.hooks.fire('receive', ...args)
+    } catch (err) {
+      debug('failed to process message', ...args)
+      return
+    }
+
+    self.emit('message', ...args)
+  }))
+}
 
 proto.use = function (strategy, opts) {
   return strategy(this, opts)

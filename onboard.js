@@ -16,19 +16,19 @@ const STRINGS = {
     'being your personal assistant rocks my world :)',
     'I missed you!'
   ],
-  THATS_ALL: "Yay! Your photo ID and selfie are now on your profile, and you can share them with other service providers"
+  THATS_ALL: "Yay! Your photo ID and selfie are now on your profile, and you can share them with other service providers",
+  WELCOME: `Hey, I'm Yuki, your on-device assistant!`
 }
 
 module.exports = () => yuki => {
+  const send = object => yuki.send({ object })
   yuki.hook('receive', co(function* ({ message }) {
     const { object } = message
     const type = object[TYPE]
     debug('received', type)
     switch (type) {
     case 'tradle.SimpleMessage':
-      yield yuki.send({
-        object: `Sorry, I don't understand "${object.message}"`
-      })
+      yield send(`Sorry, I don't understand "${object.message}"`)
 
       // yield banter({ message: object.message })
       break
@@ -61,37 +61,30 @@ module.exports = () => yuki => {
     const { profile } = object
     if (!profile) return
 
-    let isNew
-    try {
-      const me = yield state.get('me')
-      if (me.name === profile.name) return
-    } catch (err) {
-      if (!err.notFound) throw err
-
-      isNew = true
+    const me = yield state.get('me')
+    const isNew = !me
+    if (me && me.name === profile.firstName) {
+      return collectKYC()
     }
 
+    const { firstName } = profile
     let sendMessage
     if (isNew) {
-      sendMessage = yuki.send({
-        object: STRINGS.WELCOME
-      })
+      sendMessage = send(STRINGS.WELCOME)
     } else {
-      sendMessage = yuki.send({
-        object: STRINGS.HEY(profile.name)
-      })
+      sendMessage = send(STRINGS.HEY(firstName))
     }
 
     yield [
       sendMessage,
-      state.set('me', profile)
+      state.set('me', { name: firstName })
     ]
+
+    yield collectKYC()
   })
 
   const banter = co(function* ({ message }) {
-    yield yuki.send({
-      object: randomElement(STRINGS.BANTER)
-    })
+    yield send(randomElement(STRINGS.BANTER))
   })
 
   const collectKYC = co(function* () {
@@ -106,7 +99,7 @@ module.exports = () => yuki => {
   })
 
   const requestPhotoID = co(function* () {
-    yield yuki.send({
+    yield send({
       [TYPE]: 'tradle.FormRequest',
       form: 'tradle.PhotoID',
       message: STRINGS.REQUEST_PHOTO_ID
@@ -114,7 +107,7 @@ module.exports = () => yuki => {
   })
 
   const requestSelfie = co(function* () {
-    yield yuki.send({
+    yield send({
       [TYPE]: 'tradle.FormRequest',
       form: 'tradle.Selfie',
       message: STRINGS.REQUEST_SELFIE
@@ -123,9 +116,7 @@ module.exports = () => yuki => {
 
   const verifyPhotoID = co(function* ({ object }) {
     const verification = createVerificationForPhotoID(object)
-    yield yuki.send({
-      object: verification
-    })
+    yield send(verification)
   })
 
   function createVerificationForPhotoID (object) {
@@ -162,16 +153,16 @@ module.exports = () => yuki => {
     .toJSON()
   }
 
-  const handlePhotoID = co(function* () {
+  const handlePhotoID = co(function* ({ object }) {
     yield [
       state.set('havePhotoID', true),
-      verifyPhotoID()
+      verifyPhotoID({ object })
     ]
 
     yield collectKYC()
   })
 
-  const handleSelfie = co(function* () {
+  const handleSelfie = co(function* ({ object }) {
     const had = yield state.get('haveSelfie')
     if (!had) {
       yield state.set('haveSelfie', true)
@@ -180,9 +171,7 @@ module.exports = () => yuki => {
   })
 
   const onKYCd = co(function* () {
-    yield yuki.send({
-      object: STRINGS.THATS_ALL
-    })
+    yield send(STRINGS.THATS_ALL)
   })
 
   return {
