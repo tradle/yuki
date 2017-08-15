@@ -12,9 +12,11 @@ const STRINGS = {
   REQUEST_PHOTO_ID: `Can I have your passport or driver license? Take your time, I'll wait here!`,
   REQUEST_SELFIE: `Can I have a selfie of your face?`,
   BANTER: [
-    'blah!',
     'being your personal assistant rocks my world :)',
-    'I missed you!'
+    'I missed you!',
+    "I've been looking everywhere for you!",
+    "hey, you're back!",
+    'yay! I was getting so lonely here :('
   ],
   THATS_ALL: "Yay! Your photo ID and selfie are now on your profile, and you can share them with other service providers",
   WELCOME: `Hey, I'm Yuki, your on-device assistant!`
@@ -28,7 +30,7 @@ module.exports = () => yuki => {
     debug('received', type)
     switch (type) {
     case 'tradle.SimpleMessage':
-      yield send(`Sorry, I don't understand "${object.message}"`)
+      yield send(`Sorry, I'm new, I don't understand "${object.message}"`)
 
       // yield banter({ message: object.message })
       break
@@ -68,15 +70,10 @@ module.exports = () => yuki => {
     }
 
     const { firstName } = profile
-    let sendMessage
-    if (isNew) {
-      sendMessage = send(STRINGS.WELCOME)
-    } else {
-      sendMessage = send(STRINGS.HEY(firstName))
-    }
+    // const sendMessage = send(STRINGS.HEY(firstName))
 
     yield [
-      sendMessage,
+      // sendMessage,
       state.set('me', { name: firstName })
     ]
 
@@ -121,36 +118,42 @@ module.exports = () => yuki => {
 
   function createVerificationForPhotoID (object) {
     const dateVerified = Date.now()
-    return buildResource({
-      model: models[VERIFICATION],
+    const document = buildResource.stub({
       models,
+      resource: object,
+      validate: false
     })
-    .set({
+
+    const blinkIDVerification = {
+      [TYPE]: VERIFICATION,
       dateVerified,
-      document: object,
-      sources: [
-        {
-          [TYPE]: VERIFICATION,
-          dateVerified,
-          method: {
-            [TYPE]: 'tradle.APIBasedVerificationMethod',
-            api: {
-              _t: 'tradle.API',
-              name: 'BlinkID',
-              provider: {
-                title: 'MicroBlink, Inc.',
-                id: 'tradle.Organization_fakeMicroblinkHash'
-              }
-            },
-            rawData: {
-              version: '2.9.1'
-            },
-            aspect: 'ocr'
+      document,
+      method: {
+        [TYPE]: 'tradle.APIBasedVerificationMethod',
+        api: {
+          _t: 'tradle.API',
+          name: 'BlinkID',
+          provider: {
+            title: 'MicroBlink, Inc.',
+            id: 'tradle.Organization_fakeMicroblinkHash'
           }
-        }
-      ]
-    })
-    .toJSON()
+        },
+        rawData: {
+          version: '2.9.1'
+        },
+        aspect: 'ocr'
+      }
+    }
+
+    return blinkIDVerification
+    // return {
+    //   [TYPE]: VERIFICATION,
+    //   dateVerified,
+    //   document,
+    //   sources: [
+    //     blinkIDVerification
+    //   ]
+    // }
   }
 
   const handlePhotoID = co(function* ({ object }) {
@@ -174,7 +177,13 @@ module.exports = () => yuki => {
     yield send(STRINGS.THATS_ALL)
   })
 
+  const welcome = co(function* () {
+    const len = yield yuki.history.length()
+    if (len === 0) send(STRINGS.WELCOME)
+  })
+
   return {
+    welcome,
     createVerificationForPhotoID
   }
 }

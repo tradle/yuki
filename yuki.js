@@ -105,17 +105,16 @@ proto.send = co(function* ({ object, other={} }) {
 })
 
 proto.receive = function (...args) {
-  const self = this
   return this.receiveQueue.push(co(function* () {
     try {
-      yield self.hooks.fire('receive', ...args)
+      yield this.hooks.fire('receive', ...args)
     } catch (err) {
       debug('failed to process message', ...args)
       return
     }
 
-    self.emit('message', ...args)
-  }))
+    this.emit('message', ...args)
+  }).bind(this))
 }
 
 proto.use = function (strategy, opts) {
