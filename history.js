@@ -1,6 +1,7 @@
 const co = require('co').wrap
 const promisify = require('pify')
 const changesFeed = require('changes-feed')
+const bindAll = require('bindall')
 const collect = promisify(require('stream-collector'))
 const pump = require('pump')
 const map = require('map-stream')
@@ -9,7 +10,12 @@ const { TYPE, SEQ } = constants
 
 module.exports = History
 
-function History ({ keeper, db }) {
+function History (opts) {
+  if (!(this instanceof History)) return new History(opts)
+
+  bindAll(this)
+
+  const { keeper, db } = opts
   this.db = promisify(db, {
     include: ['get', 'put', 'del', 'batch']
   })
@@ -29,14 +35,15 @@ History.prototype.append = function ({ message, inbound }) {
   })
 }
 
-History.prototype.dump = function (message) {
-  const stream = this._feed.createValueStream()
+History.prototype.dump = function () {
+  const stream = this._feed.createReadStream({ keys: false })
   return collect(this._withBodies(stream))
 }
 
 History.prototype.head = co(function* (n) {
   const count = yield this.length()
-  const stream = this._feed.createValueStream({
+  const stream = this._feed.createReadStream({
+    keys: false,
     start: count - n
   })
 

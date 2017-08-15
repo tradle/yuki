@@ -1,8 +1,11 @@
+const { EventEmitter } = require('events')
+const inherits = require('inherits')
 const co = require('co').wrap
 const debug = require('debug')(require('./package.json').name)
 const clone = require('clone')
 const bindAll = require('bindall')
 const sub = require('subleveldown')
+const createHooks = require('event-hooks')
 const tradle = require('@tradle/engine')
 const { utils, constants } = tradle
 const { SIG } = constants
@@ -13,6 +16,8 @@ module.exports = Yuki
 
 function Yuki (opts) {
   if (!(this instanceof Yuki)) return new Yuki(opts)
+
+  EventEmitter.call(this)
 
   const { counterparty, db, link, identity, keys } = opts
   bindAll(this)
@@ -31,24 +36,27 @@ function Yuki (opts) {
   }
 
   this.permalink = this.node.permalink
+  this.sigPubKey = this.node.sigPubKey
   this.history = createHistory({
     keeper: counterparty.keeper,
     db: sub(db, 'h', { valueEncoding: 'json' })
   })
 
-  this.node.hook('receive', ({ message }) => {
+  this.hooks = createHooks()
+  this.hook = this.hooks.hook.bind(this.hooks)
+  this.hook('receive', ({ message }) => {
     return this.history.append({
       message,
       inbound: true
     })
   })
-
-  this.node.hook('receive', this.receive)
 }
 
 const proto = Yuki.prototype
+inherits(Yuki, EventEmitter)
 
-proto.send = co(function* ({ object }) {
+proto.send = co(function* (opts) {
+  const { object } = opts
   const message = yield this.node.send({
     to: {
       pubKey: this.counterparty.sigPubKey
@@ -56,13 +64,16 @@ proto.send = co(function* ({ object }) {
     object
   })
 
-  yield this.history.append(message)
+  yield this.hooks.fire('send', message)
+  yield this.history.append({ message })
   return message
 })
 
-proto.receive = co(function* ({ message }) {
-  debug('received', message)
-  const echo = clone(message.object)
-  delete echo[SIG]
-  yield this.send({ object: echo })
+proto.receive = co(function* (...args) {
+  yield this.hooks.fire('receive', ...args)
+  this.emit('message', ...args)
 })
+
+proto.use = function (strategy, opts) {
+  strategy(this, opts)
+}

@@ -1,7 +1,6 @@
 
 const co = require('co').wrap
 const clone = require('clone')
-const createHooks = require('event-hooks')
 const promisify = require('pify')
 const {
   utils,
@@ -34,9 +33,6 @@ function Lite ({ link, identity, keys }) {
       this.sigKey.sign(data, cb)
     }
   }
-
-  this.hooks = createHooks()
-  this.hook = this.hooks.hook.bind(this.hooks)
 }
 
 module.exports = Lite
@@ -68,14 +64,12 @@ proto.send = co(function* ({ to, object, other={} }) {
   }, other)
 
   const signedMessage = yield this.sign({ object: message })
-  return this._send({
+  yield this._send({
     to,
     message: signedMessage.object
   })
-})
 
-proto.receive = co(function* (...args) {
-  yield this.hooks.fire('receive', ...args)
+  return signedMessage.object
 })
 
 proto._send = function () {
