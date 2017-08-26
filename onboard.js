@@ -2,17 +2,28 @@ const _ = require('lodash')
 const debug = require('debug')(require('./package.json').name)
 const clone = require('clone')
 const co = require('co').wrap
+const deepEqual = require('deep-equal')
 const { constants } = require('@tradle/engine')
 const buildResource = require('@tradle/build-resource')
 const models = require('./models')
 const manageState = require('./state')
 const { SIG, TYPE } = constants
 const VERIFICATION = 'tradle.Verification'
+const PHOTO_ID = 'tradle.PhotoID'
+const SELFIE = 'tradle.Selfie'
+const SIMPLE_MESSAGE = 'tradle.SimpleMessage'
+const FORM_REQUEST = 'tradle.FormRequest'
 const templateSettings = { interpolate: /{([\s\S]+?)}/g }
 const STRINGS = {
   HEY: name => `Hey ${name}!`,
-  REQUEST_PHOTO_ID: `Can I have your passport or driver license? Take your time, I'll wait here!`,
-  REQUEST_SELFIE: `Can I have a selfie of your face?`,
+  FORM_REQUESTS: {
+    [PHOTO_ID]: `Can I have your passport or driver license? Take your time, I'll wait here!`,
+    [SELFIE]: `Can I have a selfie of your face?`,
+  },
+  FORM_REQUEST_REMINDERS: {
+    [PHOTO_ID]: `Btw, you never got back to me with your passport or driver license...`,
+    [SELFIE]: `So...not to be a pain, but I asked you for a selfie`,
+  },
   BANTER: [
     'being your personal assistant rocks my world :)',
     'I missed you!',
@@ -27,12 +38,26 @@ const STRINGS = {
 module.exports = (opts={}) => yuki => {
   const { name='Yuki' } = opts
   const send = object => yuki.send({ object })
+  const getHistory = () => yuki.history.tail(10)
+  const checkIfSentRecently = co(function* (filter) {
+    const history = yield getHistory()
+    return history.some(filter)
+  })
+
+  const sendIfNotRepeat = co(function* (object) {
+    const isRepeat = checkIfSentRecently(recent => deepEqual(object, recent))
+    if (!isRepeat) {
+      yield send(object)
+      return true
+    }
+  })
+
   yuki.hook('receive', co(function* ({ message }) {
     const { object } = message
     const type = object[TYPE]
     debug('received', type)
     switch (type) {
-    case 'tradle.SimpleMessage':
+    case SIMPLE_MESSAGE:
       yield send(`Sorry, I'm new, I don't understand "${object.message}"`)
 
       // yield banter({ message: object.message })
@@ -60,7 +85,7 @@ module.exports = (opts={}) => yuki => {
     key: 'state'
   })
 
-  // const getHistory = cachifyPromise(() => yuki.history.head(10, false))
+  // const getHistory = cachifyPromise(() => yuki.history.tail(10, false))
 
   const handleSelfIntroduction = co(function* ({ object }) {
     const { profile } = object
@@ -90,28 +115,29 @@ module.exports = (opts={}) => yuki => {
   const collectKYC = co(function* () {
     const cur = yield state.get()
     if (!cur.havePhotoID) {
-      return yield requestPhotoID()
+      return yield requestForm(PHOTO_ID)
     }
 
     if (!cur.haveSelfie) {
-      return yield requestSelfie()
+      return yield requestForm(SELFIE)
     }
   })
 
-  const requestPhotoID = co(function* () {
-    yield send({
-      [TYPE]: 'tradle.FormRequest',
+  const requestForm = co(function* (form) {
+    const message = STRINGS.FORM_REQUESTS[form]
+    const req = {
+      [TYPE]: FORM_REQUEST,
       form: 'tradle.PhotoID',
       message: STRINGS.REQUEST_PHOTO_ID
-    })
-  })
+    }
 
-  const requestSelfie = co(function* () {
-    yield send({
-      [TYPE]: 'tradle.FormRequest',
-      form: 'tradle.Selfie',
-      message: STRINGS.REQUEST_SELFIE
-    })
+    const sentReq = yield sendIfNotRepeat(req)
+    if (sentReq) return
+
+    const sentReminder = yield sendIfNotRepeat(STRINGS.FORM_REQUEST_REMINDERS[form])
+    if (sentReminder) return
+
+    debug('pouting and not saying anything')
   })
 
   const verifyPhotoID = co(function* ({ object }) {

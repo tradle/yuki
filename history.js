@@ -40,7 +40,7 @@ History.prototype.dump = function (body=true) {
   return collect(body ? this._withBodies(stream) : stream)
 }
 
-History.prototype.head = co(function* (n, body=true) {
+History.prototype.tail = co(function* (n, body=true) {
   const count = yield this.length()
   const stream = this._feed.createReadStream({
     keys: false,

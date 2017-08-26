@@ -110,7 +110,7 @@ test('yuki', loudCo(function* (t) {
   t.same(messages[0].object, forYuki.message.object)
   t.same(messages[1].object, forAlice.message.object)
 
-  const head = yield yuki.history.head(1)
+  const head = yield yuki.history.tail(1)
   t.equal(head.length, 1)
   t.same(head[0].object, forAlice.message.object)
   t.end()
