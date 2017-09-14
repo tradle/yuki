@@ -16,6 +16,7 @@ const FORM_REQUEST = 'tradle.FormRequest'
 const templateSettings = { interpolate: /{([\s\S]+?)}/g }
 const STRINGS = {
   HEY: name => `Hey ${name}!`,
+  UNFORGETTABLE: `No way!`,
   FORM_REQUESTS: {
     [PHOTO_ID]: `Can I have your passport or driver license? Take your time, I'll wait here!`,
     [SELFIE]: `Can I have a selfie of your face?`,
@@ -75,8 +76,12 @@ module.exports = (opts={}) => yuki => {
     case 'tradle.Selfie':
       yield handleSelfie({ object })
       break
+    case 'tradle.ForgetMe':
+      yield send(STRINGS.UNFORGETTABLE)
+      break
     default:
-      throw new Error(`don't know how to respond to: ${type}`)
+      debug(`don't know how to respond to: ${type}`)
+      break
     }
   }))
 

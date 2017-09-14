@@ -11,7 +11,7 @@ const createPromiseQueue = require('ya-promise-queue')
 const tradle = require('@tradle/engine')
 const { utils, constants, typeforce, types, protocol } = tradle
 const sign = promisify(protocol.sign)
-const { TYPE, TYPES, SIG, PERMALINK } = constants
+const { TYPE, TYPES, SIG, SEQ, PERMALINK } = constants
 const { MESSAGE } = TYPES
 const createHistory = require('./history')
 
@@ -89,6 +89,7 @@ proto.send = co(function* ({ object, other={} }) {
 
   const message = utils.extend({
     [TYPE]: MESSAGE,
+    [SEQ]: yield this.history.length(),
     recipientPubKey: this.counterparty.sigPubKey,
     object
   }, other)
