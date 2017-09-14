@@ -4,8 +4,8 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "@tradle/build-resource": "tradle/build-resource",
-    "@tradle/merge-models": "tradle/merge-models",
+    "@tradle/build-resource": "^2.9.1",
+    "@tradle/merge-models": "^2.0.0",
     "bindall": "^2.0.1",
     "changes-feed": "mvayngrib/changes-feed",
     "clone": "^2.1.1",
