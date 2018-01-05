@@ -1,3 +1,4 @@
+const _ = require('lodash')
 const debug = require('debug')(require('./package.json').name)
 const clone = require('clone')
 const co = require('co').wrap
@@ -7,6 +8,7 @@ const models = require('./models')
 const manageState = require('./state')
 const { SIG, TYPE } = constants
 const VERIFICATION = 'tradle.Verification'
+const templateSettings = { interpolate: /{([\s\S]+?)}/g }
 const STRINGS = {
   HEY: name => `Hey ${name}!`,
   REQUEST_PHOTO_ID: `Can I have your passport or driver license? Take your time, I'll wait here!`,
@@ -19,10 +21,11 @@ const STRINGS = {
     'yay! I was getting so lonely here :('
   ],
   THATS_ALL: "Yay! Your photo ID and selfie are now on your profile, and you can share them with other service providers",
-  WELCOME: `Hey, I'm Yuki, your on-device assistant!`
+  WELCOME: _.template(`Hey, I'm {name}, your on-device assistant!`, templateSettings)
 }
 
-module.exports = () => yuki => {
+module.exports = (opts={}) => yuki => {
+  const { name='Yuki' } = opts
   const send = object => yuki.send({ object })
   yuki.hook('receive', co(function* ({ message }) {
     const { object } = message
@@ -179,7 +182,7 @@ module.exports = () => yuki => {
 
   const welcome = co(function* () {
     const len = yield yuki.history.length()
-    if (len === 0) send(STRINGS.WELCOME)
+    if (len === 0) send(STRINGS.WELCOME({ name }))
   })
 
   return {
