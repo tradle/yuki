@@ -5,7 +5,6 @@
   "license": "MIT",
   "dependencies": {
     "@tradle/build-resource": "tradle/build-resource",
-    "@tradle/merge-models": "tradle/merge-models",
     "bindall": "^2.0.1",
     "changes-feed": "mvayngrib/changes-feed",
     "clone": "^2.1.1",
@@ -39,7 +38,6 @@
     "nkey-bitcoin": "^1.2.0",
     "nkey-curve25519": "^1.0.1",
     "nkey-ecdsa": "^1.1.0",
-    "object.omit": "^2.0.1",
     "tape": "^4.8.0"
   },
   "scripts": {

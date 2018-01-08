@@ -2,7 +2,7 @@
 const co = require('co').wrap
 const test = require('tape')
 const memdb = require('memdb')
-const omit = require('object.omit')
+const _ = require('lodash')
 const tradle = require('@tradle/engine')
 const mergeModels = require('@tradle/merge-models')
 const buildResource = require('@tradle/build-resource')
@@ -106,7 +106,7 @@ test('yuki', loudCo(function* (t) {
   const [forYuki, forAlice] = yield [yukiReceivedPromise, aliceReceivedPromise]
   const messages = yield yuki.history.dump()
   t.notSame(forYuki.message.object, forAlice.message.object)
-  t.same(omit(forYuki.object, [SIG]), omit(forAlice.object, [SIG]))
+  t.same(_.omit(forYuki.object, [SIG]), _.omit(forAlice.object, [SIG]))
   t.same(messages[0].object, forYuki.message.object)
   t.same(messages[1].object, forAlice.message.object)
 
