@@ -1,5 +1,5 @@
 const co = require('co').wrap
-const dotProp = require('dot-prop')
+const _ = require('lodash')
 const { cachifyPromiser } = require('./utils')
 
 module.exports = State
@@ -22,11 +22,11 @@ function State ({ db, key }) {
 
 State.prototype.set = co(function* (key, value) {
   yield this._init()
-  dotProp.set(this.state, key, value)
+  _.set(this.state, key, value)
   yield this.db.put(this.key, this.state)
 })
 
 State.prototype.get = co(function* (key) {
   yield this._init()
-  return key ? dotProp.get(this.state, key) : this.state
+  return key ? _.get(this.state, key) : this.state
 })

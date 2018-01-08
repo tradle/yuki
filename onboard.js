@@ -1,6 +1,5 @@
 const _ = require('lodash')
 const debug = require('debug')(require('./package.json').name)
-const clone = require('clone')
 const co = require('co').wrap
 const { constants } = require('@tradle/engine')
 const buildResource = require('@tradle/build-resource')

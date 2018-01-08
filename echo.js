@@ -1,5 +1,5 @@
 const debug = require('debug')(require('./package.json').name)
-const clone = require('clone')
+const _ = require('lodash')
 const co = require('co').wrap
 const { constants } = require('@tradle/engine')
 const { SIG } = constants
@@ -7,7 +7,7 @@ const { SIG } = constants
 module.exports = () => yuki => {
   yuki.hook('receive', co(function* ({ message }) {
     debug('received', message)
-    const echo = clone(message.object)
+    const echo = _.cloneDeep(message.object)
     delete echo[SIG]
     yield yuki.send({ object: echo })
   }))
