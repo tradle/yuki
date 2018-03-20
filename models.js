@@ -1,8 +1,8 @@
-const _ = require('lodash')
+const extend = require('lodash/extend')
 const baseModels = require('@tradle/models').models
 const customModels = require('@tradle/custom-models')
 
-module.exports = _.extend(
+module.exports = extend(
   {},
   baseModels,
   customModels

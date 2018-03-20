@@ -1,5 +1,5 @@
 const { EventEmitter } = require('events')
-const _ = require('lodash')
+const cloneDeep = require('lodash/cloneDeep')
 const inherits = require('inherits')
 const co = require('co').wrap
 const promisify = require('pify')
@@ -66,7 +66,7 @@ inherits(Yuki, EventEmitter)
 const proto = Yuki.prototype
 
 proto.sign = function ({ object }) {
-  object = _.cloneDeep(object)
+  object = cloneDeep(object)
   delete object[SIG]
   return sign({
     object,

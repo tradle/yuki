@@ -1,6 +1,6 @@
 
 const co = require('co').wrap
-const _ = require('lodash')
+const cloneDeep = require('lodash/cloneDeep')
 const promisify = require('pify')
 const {
   utils,
@@ -39,7 +39,7 @@ module.exports = Lite
 const proto = Lite.prototype
 
 proto.sign = function ({ object }) {
-  object = _.cloneDeep(object)
+  object = cloneDeep(object)
   delete object[SIG]
   return sign({
     object,

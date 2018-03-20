@@ -1,4 +1,4 @@
-const _ = require('lodash')
+const template = require('lodash/template')
 const debug = require('debug')(require('./package.json').name)
 const co = require('co').wrap
 const { constants } = require('@tradle/engine')
@@ -20,7 +20,7 @@ const STRINGS = {
     'yay! I was getting so lonely here :('
   ],
   THATS_ALL: "Yay! Your photo ID and selfie are now on your profile, and you can share them with other service providers",
-  WELCOME: _.template(`Hey, I'm {name}, your on-device assistant!`, templateSettings)
+  WELCOME: template(`Hey, I'm {name}, your on-device assistant!`, templateSettings)
 }
 
 module.exports = (opts={}) => yuki => {
