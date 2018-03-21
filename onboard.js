@@ -7,6 +7,9 @@ const models = require('./models')
 const manageState = require('./state')
 const { SIG, TYPE } = constants
 const VERIFICATION = 'tradle.Verification'
+const FORM_REQUEST = 'tradle.FormRequest'
+const PHOTO_ID = 'tradle.PhotoID'
+const SELFIE = 'tradle.Selfie'
 const templateSettings = { interpolate: /{([\s\S]+?)}/g }
 const STRINGS = {
   HEY: name => `Hey ${name}!`,
@@ -37,16 +40,20 @@ module.exports = (opts={}) => yuki => {
       // yield banter({ message: object.message })
       break
     case 'tradle.CustomerWaiting':
-      yield banter({ message: object.message })
+      let collected = yield collectKYC()
+      if (!collected) {
+        yield banter({ message: object.message })
+      }
+
       break
     case 'tradle.SelfIntroduction':
     case 'tradle.IdentityPublishRequest':
       yield handleSelfIntroduction({ object })
       break
-    case 'tradle.PhotoID':
+    case PHOTO_ID:
       yield handlePhotoID({ object })
       break
-    case 'tradle.Selfie':
+    case SELFIE:
       yield handleSelfie({ object })
       break
     default:
@@ -89,26 +96,34 @@ module.exports = (opts={}) => yuki => {
   const collectKYC = co(function* () {
     const cur = yield state.get()
     if (!cur.havePhotoID) {
-      return yield requestPhotoID()
+      const asked = yield didRequestRecently(PHOTO_ID)
+      if (asked) return
+
+      yield requestPhotoID()
+      return true
     }
 
     if (!cur.haveSelfie) {
-      return yield requestSelfie()
+      const asked = yield didRequestRecently(SELFIE)
+      if (asked) return
+
+      yield requestSelfie()
+      return true
     }
   })
 
   const requestPhotoID = co(function* () {
     yield send({
-      [TYPE]: 'tradle.FormRequest',
-      form: 'tradle.PhotoID',
+      [TYPE]: FORM_REQUEST,
+      form: PHOTO_ID,
       message: STRINGS.REQUEST_PHOTO_ID
     })
   })
 
   const requestSelfie = co(function* () {
     yield send({
-      [TYPE]: 'tradle.FormRequest',
-      form: 'tradle.Selfie',
+      [TYPE]: FORM_REQUEST,
+      form: SELFIE,
       message: STRINGS.REQUEST_SELFIE
     })
   })
@@ -182,6 +197,14 @@ module.exports = (opts={}) => yuki => {
   const welcome = co(function* () {
     const len = yield yuki.history.length()
     if (len === 0) send(STRINGS.WELCOME({ name }))
+  })
+
+  const didRequestRecently = co(function* (form) {
+    const msgs = yield yuki.history.head(10)
+    return msgs
+      .map(msg => msg.object)
+      .filter(object => object[TYPE] === FORM_REQUEST)
+      .some(object => object.form === form)
   })
 
   return {
